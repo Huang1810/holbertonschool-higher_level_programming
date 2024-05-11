@@ -11,4 +11,3 @@ elif n == 0:
     print('Last digit of %d is %d and is 0' % (number, n))
 else:
     print('Last digit of %d is %d and is less than 6 and not 0' % (number, n))
-    

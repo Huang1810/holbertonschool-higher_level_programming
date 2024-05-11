@@ -7,4 +7,4 @@ elif number == 0:
     print("%d is zero" % number)
 else:
     print("%d is positive" % number)
-    
+   
