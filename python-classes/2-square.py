@@ -21,3 +21,7 @@ class Square:
         else:
             self.__size = size
 
+    @property
+    def size(self):
+        """Getter for the size attribute"""
+        return self.__size
