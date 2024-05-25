@@ -1,0 +1,30 @@
+module text indentation
+=======================
+
+import function from the module:
+    >>> text_indentation = __import__("5-text_indentation").text_indentation
+
+basic test:
+    >>> text_indentation("me: hello. how are you? she: I'm fine, thanks!.")
+    me:
+    <BLANKLINE>
+    hello.
+    <BLANKLINE>
+    how are you?
+    <BLANKLINE>
+    she:
+    <BLANKLINE>
+    I'm fine, thanks!.
+    <BLANKLINE>
+
+test text not a string:
+    >>> text_indentation(12345)
+    Traceback (most recent call last):
+    TypeError: text must be a string
+
+test with no special characters:
+    >>> text_indentation("this test has no special characters")
+    this test has no special characters
+
+test text empty:
+    >>> text_indentation("")
