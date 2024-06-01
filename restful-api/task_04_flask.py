@@ -1,80 +1,40 @@
-import unittest
-import json
-from task_04_flask import app
+from flask import Flask, jsonify, request
 
-class TestFlaskAPI(unittest.TestCase):
-    def setUp(self):
-        self.client = app.test_client()
-        
-        # Clear the users dictionary before each test
-        app.users = {}
+app = Flask(__name__)
 
-    def test_home_route(self):
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.decode('utf-8'), 'Welcome to the Flask API!')
+users = {
+    "jane": {"username": "jane", "name": "Jane", "age": 28, "city": "Los Angeles"},
+    "john": {"username": "john", "name": "John", "age": 30, "city": "New York"}
+}
 
-    def test_data_route(self):
-        response = self.client.get('/data')
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertIsInstance(data, list)
+@app.route('/')
+def home():
+    return "Welcome to the Flask API!"
 
-    def test_status_route(self):
-        response = self.client.get('/status')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data.decode('utf-8'), 'OK')
+@app.route('/data')
+def get_data():
+    return jsonify(list(users.keys()))
 
-    def test_get_user(self):
-        app.users['john'] = {"username": "john", "name": "John", "age": 30, "city": "New York"}
-        response = self.client.get('/users/john')
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertEqual(data['username'], 'john')
+@app.route('/status')
+def status():
+    return "OK"
 
-    def test_get_nonexistent_user(self):
-        response = self.client.get('/users/nonexistent')
-        self.assertEqual(response.status_code, 404)
-        data = json.loads(response.data)
-        self.assertEqual(data['error'], 'User not found')
+@app.route('/users/<username>')
+def get_user(username):
+    user = users.get(username)
+    if user:
+        return jsonify(user)
+    else:
+        return jsonify({"error": "User not found"})
 
-    def test_add_user(self):
-        new_user_data = {
-            'username': 'alice',
-            'name': 'Alice',
-            'age': 25,
-            'city': 'San Francisco'
-        }
-        response = self.client.post('/add_user', json=new_user_data)
-        self.assertEqual(response.status_code, 201)
-        data = json.loads(response.data)
-        self.assertEqual(data['message'], 'User added')
-        self.assertEqual(data['user']['username'], 'alice')
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    data = request.json
+    username = data.get('username')
+    if username in users:
+        return jsonify({"error": "User already exists"})
+    users[username] = data
+    return jsonify({"message": "User added", "user": data})
 
-    def test_add_user_no_username(self):
-        new_user_data = {
-            'name': 'Alice',
-            'age': 25,
-            'city': 'San Francisco'
-        }
-        response = self.client.post('/add_user', json=new_user_data)
-        self.assertEqual(response.status_code, 400)
-        data = json.loads(response.data)
-        self.assertEqual(data['error'], 'Username is required')
-
-    def test_add_duplicate_user(self):
-        app.users['john'] = {"username": "john", "name": "John", "age": 30, "city": "New York"}
-        new_user_data = {
-            'username': 'john',
-            'name': 'John',
-            'age': 30,
-            'city': 'New York'
-        }
-        response = self.client.post('/add_user', json=new_user_data)
-        self.assertEqual(response.status_code, 400)
-        data = json.loads(response.data)
-        self.assertEqual(data['error'], 'User already exists')
-
-if __name__ == '__main__':
-    unittest.main()
-
+if __name__ == "__main__":
+    app.run(debug=True)
