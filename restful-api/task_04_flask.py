@@ -2,10 +2,12 @@ import unittest
 import json
 from task_04_flask import app
 
-
 class TestFlaskAPI(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
+        
+        # Clear the users dictionary before each test
+        app.users = {}
 
     def test_home_route(self):
         response = self.client.get('/')
@@ -24,6 +26,7 @@ class TestFlaskAPI(unittest.TestCase):
         self.assertEqual(response.data.decode('utf-8'), 'OK')
 
     def test_get_user(self):
+        app.users['john'] = {"username": "john", "name": "John", "age": 30, "city": "New York"}
         response = self.client.get('/users/john')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
@@ -60,6 +63,7 @@ class TestFlaskAPI(unittest.TestCase):
         self.assertEqual(data['error'], 'Username is required')
 
     def test_add_duplicate_user(self):
+        app.users['john'] = {"username": "john", "name": "John", "age": 30, "city": "New York"}
         new_user_data = {
             'username': 'john',
             'name': 'John',
@@ -71,6 +75,6 @@ class TestFlaskAPI(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data['error'], 'User already exists')
 
-
 if __name__ == '__main__':
     unittest.main()
+
