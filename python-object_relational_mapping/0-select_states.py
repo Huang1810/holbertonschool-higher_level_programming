@@ -23,6 +23,8 @@ def main():
     try:
         # Establish a connection to the database
         db = MySQLdb.connect(user=mySQL_u, passwd=mySQL_p, db=db_name, host='localhost', port=3306)
+        print("Connected to MySQL database")
+
         cur = db.cursor()
 
         # Execute the query to fetch all states ordered by id
@@ -40,10 +42,11 @@ def main():
 
     finally:
         # Close cursor and connection
-        if cur:
+        if 'cur' in locals() and cur:
             cur.close()
-        if db:
+        if 'db' in locals() and db:
             db.close()
+        print("MySQL connection closed")
 
 if __name__ == "__main__":
     main()
