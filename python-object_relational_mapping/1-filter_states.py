@@ -1,34 +1,26 @@
 #!/usr/bin/python3
 """
-Lists all states starting with 'N' from the database hbtn_0e_0_usa
-
-3 arguments:
-- username of the MySQL user
-- password of the MySQL user
-- database name of the MySQL server
+Python module that lists all states with a name
+starting with N (upper N) from the database hbtn_0e_0_usa
+Code should not be executed when imported
 """
 if __name__ == "__main__":
     import MySQLdb
     import sys
+
     username = sys.argv[1]
     password = sys.argv[2]
     database = sys.argv[3]
 
-    db = MySQLdb.connect(
-        host="localhost",
-        port=3306,
-        user=username,
-        passwd=password,
-        db=database
-    )
-
+    db = MySQLdb.connect(host="localhost", port=3306, user=username,
+                         password=password, database=database)
     cur = db.cursor()
-    cur.execute("SELECT * FROM states \
-        WHERE name LIKE BINARY 'N%' ORDER BY id ASC")
-    states = cur.fetchall()
+    cur.execute(
+        """SELECT * FROM states WHERE name LIKE BINARY 'N%' ORDER BY id ASC""")
 
-    for row in states:
-        print(row)
+    rows = cur.fetchall()
+    for item in rows:
+        print(item)
 
     cur.close()
     db.close()
