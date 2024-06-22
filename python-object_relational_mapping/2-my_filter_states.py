@@ -13,20 +13,41 @@ Arguments:
 import sys
 import MySQLdb
 
-if __name__ == "__main__":
+def main():
+    if len(sys.argv) != 5:
+        print("Usage: {} <mysql_username> <mysql_password> <database_name> <state_name>".format(sys.argv[0]))
+        return
+
     mySQL_u = sys.argv[1]
     mySQL_p = sys.argv[2]
     db_name = sys.argv[3]
-
     searched_name = sys.argv[4]
 
-    # localhost:3306
-    db = MySQLdb.connect(user=mySQL_u, passwd=mySQL_p, db=db_name)
-    cur = db.cursor()
+    try:
+        # Establish a connection to the database
+        db = MySQLdb.connect(user=mySQL_u, passwd=mySQL_p, db=db_name, host='localhost', port=3306)
+        cur = db.cursor()
 
-    cur.execute("SELECT * FROM states WHERE name LIKE BINARY '{}' ORDER BY id"
-                .format(searched_name))
-    rows = cur.fetchall()
+        # Execute the query to fetch states matching the searched name
+        query = "SELECT * FROM states WHERE name LIKE BINARY '{}' ORDER BY id".format(searched_name)
+        cur.execute(query)
 
-    for row in rows:
-        print(row)
+        # Fetch all rows
+        rows = cur.fetchall()
+
+        # Print each row
+        for row in rows:
+            print(row)
+
+    except MySQLdb.Error as e:
+        print("MySQL Error [{}]: {}".format(e.args[0], e.args[1]))
+
+    finally:
+        # Close cursor and connection
+        if cur:
+            cur.close()
+        if db:
+            db.close()
+
+if __name__ == "__main__":
+    main()
