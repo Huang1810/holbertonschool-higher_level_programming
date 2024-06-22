@@ -22,11 +22,13 @@ def main():
 
     try:
         # Establish a connection to the database
-        db = MySQLdb.connect(user=mySQL_u, passwd=mySQL_p, db=db_name)
+        db = MySQLdb.connect(user=mySQL_u, passwd=mySQL_p, db=db_name, host='localhost', port=3306)
         cur = db.cursor()
 
         # Execute the query to fetch all states ordered by id
         cur.execute("SELECT * FROM states ORDER BY id")
+
+        # Fetch all rows
         rows = cur.fetchall()
 
         # Print each row
@@ -34,7 +36,7 @@ def main():
             print(row)
 
     except MySQLdb.Error as e:
-        print("Error {}: {}".format(e.args[0], e.args[1]))
+        print("MySQL Error [{}]: {}".format(e.args[0], e.args[1]))
 
     finally:
         # Close cursor and connection
